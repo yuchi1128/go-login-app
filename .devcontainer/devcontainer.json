@@ -1,0 +1,24 @@
+{
+  "name": "Go Login App Dev",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "go.toolsManagement.autoUpdate": true,
+        "go.useLanguageServer": true,
+        "go.formatTool": "gofmt",
+        "editor.formatOnSave": true
+      },
+      "extensions": [
+        "golang.go",
+        "ms-azuretools.vscode-docker",
+        "github.copilot"
+      ]
+    }
+  },
+  "forwardPorts": [8080],
+  "postCreateCommand": "sh -c 'go mod download && git config --global user.name \"Taro Yamada\" && git config --global user.email \"taro@example.com\"'",
+  "remoteUser": "vscode"
+}
