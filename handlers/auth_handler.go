@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"time"
 
-	"your-github-username/go-login-app/database"
-	"your-github-username/go-login-app/models"
-	"your-github-username/go-login-app/utils"
+	"github.com/yuchi1128/go-login-app/database"
+	"github.com/yuchi1128/go-login-app/models"
+	"github.com/yuchi1128/go-login-app/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"

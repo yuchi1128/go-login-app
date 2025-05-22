@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"your-github-username/go-login-app/handlers"
+	"github.com/yuchi1128/go-login-app/handlers"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
