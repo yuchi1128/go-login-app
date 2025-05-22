@@ -1,4 +1,3 @@
-// database/postgres.go
 package database
 
 import (
@@ -7,6 +6,8 @@ import (
 	"log"
 	"os"
 	"time"
+
+	"github.com/yuchi1128/go-login-app/models"
 
 	_ "github.com/lib/pq"
 )
@@ -64,4 +65,61 @@ func createUsersTable() {
 		log.Fatalf("usersテーブル作成エラー: %v", err)
 	}
 	log.Println("usersテーブル準備完了 (または既に存在します)")
+}
+
+// CreateUser は新しいユーザーをデータベースに登録します
+func CreateUser(user *models.User) (int, error) {
+	query := `INSERT INTO users (username, email, password_hash)
+			   VALUES ($1, $2, $3) RETURNING id`
+	var userID int
+	err := DB.QueryRow(query, user.Username, user.Email, user.PasswordHash).Scan(&userID)
+	if err != nil {
+		return 0, fmt.Errorf("ユーザー作成エラー: %w", err)
+	}
+	return userID, nil
+}
+
+// GetUserByEmailOrUsername はEmailまたはUsernameでユーザーを検索します
+func GetUserByEmailOrUsername(identifier string) (*models.User, error) {
+	user := &models.User{}
+	query := `SELECT id, username, email, password_hash, created_at, updated_at
+			   FROM users WHERE email = $1 OR username = $1`
+	err := DB.QueryRow(query, identifier).Scan(
+		&user.ID, &user.Username, &user.Email, &user.PasswordHash, &user.CreatedAt, &user.UpdatedAt,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // ユーザーが見つからない場合はnilを返す
+		}
+		return nil, fmt.Errorf("ユーザー検索エラー (%s): %w", identifier, err)
+	}
+	return user, nil
+}
+
+// GetUserByEmail はEmailでユーザーを検索します（重複チェック用）
+func GetUserByEmail(email string) (*models.User, error) {
+	user := &models.User{}
+	query := `SELECT id FROM users WHERE email = $1`
+	err := DB.QueryRow(query, email).Scan(&user.ID) // IDだけ取得できれば存在確認は可能
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("Email検索エラー: %w", err)
+	}
+	return user, nil
+}
+
+// GetUserByUsername はUsernameでユーザーを検索します（重複チェック用）
+func GetUserByUsername(username string) (*models.User, error) {
+	user := &models.User{}
+	query := `SELECT id FROM users WHERE username = $1`
+	err := DB.QueryRow(query, username).Scan(&user.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("Username検索エラー: %w", err)
+	}
+	return user, nil
 }
