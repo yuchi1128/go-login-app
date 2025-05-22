@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -45,14 +46,10 @@ func AuthMiddleware() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
-			if ve, ok := err.(*jwt.ValidationError); ok {
-				if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-					c.JSON(http.StatusUnauthorized, gin.H{"error": "不正な形式のトークンです"})
-				} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
-					c.JSON(http.StatusUnauthorized, gin.H{"error": "トークンが期限切れか、まだ有効ではありません"})
-				} else {
-					c.JSON(http.StatusUnauthorized, gin.H{"error": "トークンを検証できませんでした: " + err.Error()})
-				}
+			if errors.Is(err, jwt.ErrTokenMalformed) {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "トークンの形式が不正です"})
+			} else if errors.Is(err, jwt.ErrTokenExpired) || errors.Is(err, jwt.ErrTokenNotValidYet) {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "トークンが期限切れか、まだ有効ではありません"})
 			} else {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "トークンを検証できませんでした: " + err.Error()})
 			}
@@ -75,7 +72,6 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
 
 		c.Next()
 	}
@@ -113,7 +109,6 @@ func SetupRouter() *gin.Engine {
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "UP"})
 	})
-
 
 	return router
 }
