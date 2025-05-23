@@ -4,9 +4,16 @@ Go (Gin) 製ログインAPI。ユーザー名/Email対応、JWT認証、PostgreS
 
 ## 起動手順
 
-1.  `git clone https://github.com/yuchi1128/go-login-app`
-2.  VS Codeで開き「Reopen in Container」
-3.  `go run main.go`
+1.  **リポジトリのクローン:**
+    ```bash
+    git clone https://github.com/yuchi1128/go-login-app
+    ```
+2.  **開発コンテナで開く:**
+    VS Codeで本リポジトリのルートディレクトリを開き「Reopen in Container」を選択しコンテナを構築
+3.  **アプリケーションの起動:**
+    ```bash
+    go run main.go
+    ```
 
 ## API (抜粋)
 
